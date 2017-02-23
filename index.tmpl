@@ -1,0 +1,16 @@
+<html>
+  <head>
+    <title>nyx</title>
+  </head>
+
+  <body>
+    <h1>Welcome to Nyx!</h2>
+    <form method="POST">
+      <label>Email:</label>
+      <input type="email" name="email" required />
+      <input type="hidden" name="state" readonly value="{{.State}}" />
+      <br />
+      <input type="submit" />
+    </form>
+  </body>
+</html>

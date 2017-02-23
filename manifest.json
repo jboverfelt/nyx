@@ -1,5 +1,8 @@
 {
     "dependencies": {
+        "github.com/satori/go.uuid": {
+            "version": "v1.1.0"
+        },
         "golang.org/x/oauth2": {
             "branch": "master"
         }
