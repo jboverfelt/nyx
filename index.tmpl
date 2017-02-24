@@ -5,7 +5,7 @@
 
   <body>
     <h1>Welcome to Nyx!</h2>
-    <form method="POST">
+    <form method="POST" action="/login">
       <label>Email:</label>
       <input type="email" name="email" required />
       <input type="hidden" name="state" readonly value="{{.State}}" />

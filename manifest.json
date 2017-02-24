@@ -1,5 +1,8 @@
 {
     "dependencies": {
+        "github.com/robfig/cron": {
+            "branch": "master"
+        },
         "github.com/satori/go.uuid": {
             "version": "v1.1.0"
         },
