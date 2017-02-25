@@ -1,15 +1,15 @@
 <html>
   <head>
     <title>nyx</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/min/1.5/min.min.css" media="screen" />
   </head>
 
   <body>
-    <h1>Welcome to Nyx!</h2>
+    <h1>Welcome to Nyx!</h1>
+    <p>Enter your email below to receive a daily sleep summary from your Fitbit device</p>
     <form method="POST" action="/login">
-      <label>Email:</label>
-      <input type="email" name="email" required />
+      <input type="email" name="email" required placeholder="Email" />
       <input type="hidden" name="state" readonly value="{{.State}}" />
-      <br />
       <input type="submit" />
     </form>
   </body>
