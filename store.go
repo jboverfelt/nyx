@@ -1,22 +1,20 @@
-package store
+package main
 
 import (
 	"sync"
-
-	"github.com/jboverfelt/nyx/models"
 )
 
 // Store represents a store of Users
 // Store must be safe for use by concurrent goroutines
 type Store interface {
-	Upsert(user models.User) error
-	GetByState(state string) (*models.User, error)
-	GetByEmail(email string) (*models.User, error)
-	GetAll() ([]*models.User, error)
+	Upsert(user User) error
+	GetByState(state string) (*User, error)
+	GetByEmail(email string) (*User, error)
+	GetAll() ([]*User, error)
 }
 
 type inMemoryStore struct {
-	users []*models.User
+	users []*User
 	mutex *sync.RWMutex
 }
 
@@ -27,7 +25,7 @@ func NewInMemoryStore() Store {
 	}
 }
 
-func (i *inMemoryStore) Upsert(user models.User) error {
+func (i *inMemoryStore) Upsert(user User) error {
 	i.mutex.Lock()
 	defer i.mutex.Unlock()
 
@@ -44,7 +42,7 @@ func (i *inMemoryStore) Upsert(user models.User) error {
 	return nil
 }
 
-func (i *inMemoryStore) GetByState(state string) (*models.User, error) {
+func (i *inMemoryStore) GetByState(state string) (*User, error) {
 	i.mutex.RLock()
 	defer i.mutex.RUnlock()
 
@@ -57,7 +55,7 @@ func (i *inMemoryStore) GetByState(state string) (*models.User, error) {
 	return nil, nil
 }
 
-func (i *inMemoryStore) GetByEmail(email string) (*models.User, error) {
+func (i *inMemoryStore) GetByEmail(email string) (*User, error) {
 	i.mutex.RLock()
 	defer i.mutex.RUnlock()
 
@@ -70,6 +68,6 @@ func (i *inMemoryStore) GetByEmail(email string) (*models.User, error) {
 	return nil, nil
 }
 
-func (i *inMemoryStore) GetAll() ([]*models.User, error) {
+func (i *inMemoryStore) GetAll() ([]*User, error) {
 	return i.users, nil
 }
