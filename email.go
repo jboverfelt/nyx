@@ -2,6 +2,7 @@ package main
 
 import (
 	"html/template"
+	"log"
 	"time"
 
 	"bytes"
@@ -65,6 +66,7 @@ func sendEmail(mg mailgun.Mailgun, sleep SleepResponse, u *User) error {
 		body = genNoSleepMessage()
 	}
 
+	log.Printf("Sending message to %s\n", u.Email)
 	msg := mg.NewMessage(fromAddr, subject, body, toAddr)
 	_, _, err := mg.Send(msg)
 
