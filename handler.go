@@ -51,6 +51,7 @@ func NewHandler(e *Env, handlerFunc func(e *Env, w http.ResponseWriter, r *http.
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := h.h(h.Env, w, r)
 	if err != nil {
+		log.Printf("ERROR: %v", err)
 		switch e := err.(type) {
 		case Error:
 			// We can retrieve the status here and write out a specific

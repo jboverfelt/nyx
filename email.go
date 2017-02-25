@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"time"
@@ -24,16 +25,24 @@ func genSleepMessage(sleep SleepResponse) (string, error) {
 		return "", err
 	}
 
+	dur, err := time.ParseDuration(fmt.Sprintf("%dm", sleep.Summary.TotalMinutesAsleep))
+
+	if err != nil {
+		return "", err
+	}
+
 	data := struct {
-		Efficiency   int
-		StartTime    string
-		AwakeCount   int
-		MinutesAwake int
+		Efficiency       int
+		StartTime        string
+		TotalHoursAsleep string
+		AwakeCount       int
+		MinutesAwake     int
 	}{
-		Efficiency:   sleep.Sleep[0].Efficiency,
-		StartTime:    t.Format(time.Kitchen),
-		AwakeCount:   sleep.Sleep[0].AwakeCount,
-		MinutesAwake: sleep.Sleep[0].MinutesAwake,
+		Efficiency:       sleep.Sleep[0].Efficiency,
+		StartTime:        t.Format(time.Kitchen),
+		TotalHoursAsleep: fmt.Sprintf("%.2f", dur.Hours()),
+		AwakeCount:       sleep.Sleep[0].AwakeCount,
+		MinutesAwake:     sleep.Sleep[0].MinutesAwake,
 	}
 
 	tmpl := template.Must(template.ParseFiles("templates/email.tmpl"))

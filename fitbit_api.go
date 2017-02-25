@@ -81,7 +81,7 @@ func getSleepData(oAuthConf *oauth2.Config, token *oauth2.Token) (*SleepResponse
 	err = json.NewDecoder(resp.Body).Decode(&sleepResponse)
 
 	if err != nil {
-		return nil, fmt.Errorf("ERROR: failed to decode API response: %v", err.Error())
+		return nil, fmt.Errorf("ERROR: failed to decode API response: %v", err)
 	}
 
 	return &sleepResponse, nil
@@ -93,7 +93,7 @@ func sleepChecker(oAuthConf *oauth2.Config, s Store, mg mailgun.Mailgun) func() 
 		us, err := s.GetAll()
 
 		if err != nil {
-			log.Printf("ERROR: Fetching all users failed: %v\n", err.Error())
+			log.Printf("ERROR: Fetching all users failed: %v\n", err)
 		}
 
 		if us == nil {
@@ -112,14 +112,14 @@ func sleepChecker(oAuthConf *oauth2.Config, s Store, mg mailgun.Mailgun) func() 
 			sleep, err := getSleepData(oAuthConf, token)
 
 			if err != nil {
-				log.Printf("ERROR: failed to get sleep data: %v\n", err.Error())
+				log.Printf("ERROR: failed to get sleep data: %v\n", err)
 				continue
 			}
 
 			err = sendEmail(mg, *sleep, u)
 
 			if err != nil {
-				log.Printf("ERROR: failed to send email: %v\n", err.Error())
+				log.Printf("ERROR: failed to send email: %v\n", err)
 				continue
 			}
 		}
