@@ -36,13 +36,17 @@ func genSleepMessage(sleep SleepResponse) (string, error) {
 		StartTime        string
 		TotalHoursAsleep string
 		AwakeCount       int
-		MinutesAwake     int
+		AwakeDuration    int
+		RestlessCount    int
+		RestlessDuration int
 	}{
 		Efficiency:       sleep.Sleep[0].Efficiency,
 		StartTime:        t.Format(time.Kitchen),
 		TotalHoursAsleep: fmt.Sprintf("%.2f", dur.Hours()),
 		AwakeCount:       sleep.Sleep[0].AwakeCount,
-		MinutesAwake:     sleep.Sleep[0].MinutesAwake,
+		AwakeDuration:    sleep.Sleep[0].AwakeDuration,
+		RestlessCount:    sleep.Sleep[0].RestlessCount,
+		RestlessDuration: sleep.Sleep[0].RestlessDuration,
 	}
 
 	tmpl := template.Must(template.ParseFiles("templates/email.tmpl"))
@@ -59,7 +63,7 @@ func genSleepMessage(sleep SleepResponse) (string, error) {
 }
 
 func sendEmail(mg mailgun.Mailgun, sleep SleepResponse, u *User) error {
-	fromAddr := "admin@" + mg.Domain()
+	fromAddr := "nyx@" + mg.Domain()
 	subject := "Last Night's Sleep"
 	toAddr := u.Email
 	var body string
