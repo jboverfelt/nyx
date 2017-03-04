@@ -102,6 +102,11 @@ func sleepChecker(oAuthConf *oauth2.Config, s Store, mg mailgun.Mailgun) func() 
 		}
 
 		for _, u := range us {
+			if u.Token == "" {
+				log.Printf("ERROR: token was nil for email %v\n", u.Email)
+				continue
+			}
+
 			token, err := parseToken(u.Token)
 
 			if err != nil {
