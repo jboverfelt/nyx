@@ -2,3 +2,4 @@ config.json
 vendor
 lock.json
 nyx
+*.db

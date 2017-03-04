@@ -5,7 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/boltdb/bolt"
 	"github.com/mailgun/mailgun-go"
 	"github.com/robfig/cron"
 	"golang.org/x/oauth2"
@@ -51,7 +53,13 @@ func main() {
 		RedirectURL:  cfg.RedirectURL,
 	}
 
-	store := NewInMemoryStore()
+	db, err := bolt.Open("users.db", 0600, &bolt.Options{Timeout: 5 * time.Second})
+
+	if err != nil {
+		log.Fatalf("Error opening database connection: %v\n", err)
+	}
+
+	store := NewBoltStore(db)
 
 	env := &Env{
 		OAuthConf: oAuthConf,
