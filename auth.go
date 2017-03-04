@@ -87,7 +87,7 @@ func fitbitCallback(e *Env, w http.ResponseWriter, r *http.Request) error {
 
 	log.Printf("Token added: %v", u.Token)
 
-	fmt.Fprintf(w, "Success! Expect an email at 10am!\n")
+	fmt.Fprintf(w, "Success! Expect an email in the morning!\n")
 
 	return nil
 }
