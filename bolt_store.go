@@ -91,6 +91,8 @@ func (b *boltStore) UpdateByAccessToken(oldToken, newToken *oauth2.Token) error 
 				if err != nil {
 					return err
 				}
+
+				return nil
 			}
 		}
 
