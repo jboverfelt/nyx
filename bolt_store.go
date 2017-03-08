@@ -3,8 +3,6 @@ package main
 import (
 	"encoding/json"
 
-	"golang.org/x/oauth2"
-
 	"github.com/boltdb/bolt"
 )
 
@@ -40,60 +38,6 @@ func (b *boltStore) Upsert(u User) error {
 
 		if err != nil {
 			return err
-		}
-
-		return nil
-	})
-}
-
-// This is wildly inefficient, but usage of BoltDB only allows
-// querying by key
-func (b *boltStore) UpdateByAccessToken(oldToken, newToken *oauth2.Token) error {
-	return b.db.Update(func(tx *bolt.Tx) error {
-		oldTokStr, err := json.Marshal(oldToken)
-
-		if err != nil {
-			return err
-		}
-
-		newTokStr, err := json.Marshal(newToken)
-
-		if err != nil {
-			return err
-		}
-
-		bucket := tx.Bucket([]byte(userBucket))
-
-		if bucket == nil {
-			return nil
-		}
-
-		c := bucket.Cursor()
-
-		for k, v := c.First(); k != nil; k, v = c.Next() {
-			var u User
-			err := json.Unmarshal(v, &u)
-
-			if err != nil {
-				return err
-			}
-
-			if u.Token == string(oldTokStr) {
-				u.Token = string(newTokStr)
-				jsonStr, err := json.Marshal(u)
-
-				if err != nil {
-					return err
-				}
-
-				err = bucket.Put([]byte(u.State), jsonStr)
-
-				if err != nil {
-					return err
-				}
-
-				return nil
-			}
 		}
 
 		return nil

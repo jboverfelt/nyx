@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"time"
 
 	"github.com/mailgun/mailgun-go"
@@ -44,41 +43,6 @@ type SleepResponse struct {
 	} `json:"summary"`
 }
 
-// Taken from rakyll's implementation in issue 84
-// https://github.com/golang/oauth2/issues/84#issuecomment-175834679
-type cacherTransport struct {
-	Base *oauth2.Transport
-	s    Store
-}
-
-// fitbit api refresh tokens are single use, so must save new ones
-func (c *cacherTransport) RoundTrip(req *http.Request) (resp *http.Response, err error) {
-	tok, err := c.Base.Source.Token()
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err = c.Base.RoundTrip(req)
-	if err != nil {
-		return nil, err
-	}
-
-	newTok, err := c.Base.Source.Token()
-	if err != nil {
-		return nil, err
-	}
-
-	if tok.AccessToken != newTok.AccessToken {
-		err = c.s.UpdateByAccessToken(tok, newTok)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return resp, nil
-}
-
 func genFitbitURL() string {
 	urlFirst := "https://api.fitbit.com/1/user/-/sleep/date/"
 	urlSecond := ".json?isMainSleep=true"
@@ -101,14 +65,54 @@ func parseToken(tok string) (*oauth2.Token, error) {
 	return &token, nil
 }
 
-func getSleepData(oAuthConf *oauth2.Config, token *oauth2.Token, s Store) (*SleepResponse, error) {
-	ts := oAuthConf.TokenSource(oauth2.NoContext, token)
-	tr := &oauth2.Transport{Source: ts}
+func dumpToken(tok *oauth2.Token) (string, error) {
+	tokStr, err := json.Marshal(tok)
 
-	client := &http.Client{
-		Transport: &cacherTransport{Base: tr, s: s},
+	if err != nil {
+		return "", err
 	}
 
+	return string(tokStr), nil
+
+}
+
+// ensure the token is valid and save off the new token
+// if a refresh is needed
+func refreshToken(source oauth2.TokenSource, curTok *oauth2.Token, s Store, u User) error {
+	tok, err := source.Token()
+
+	if err != nil {
+		return err
+	}
+
+	if tok.AccessToken != curTok.AccessToken {
+		tokStr, err := dumpToken(tok)
+
+		if err != nil {
+			return err
+		}
+
+		u.Token = tokStr
+		err = s.Upsert(u)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func getSleepData(oAuthConf *oauth2.Config, token *oauth2.Token, s Store, u User) (*SleepResponse, error) {
+	ts := oAuthConf.TokenSource(oauth2.NoContext, token)
+
+	err := refreshToken(ts, token, s, u)
+
+	if err != nil {
+		return nil, err
+	}
+
+	client := oauth2.NewClient(oauth2.NoContext, ts)
 	resp, err := client.Get(genFitbitURL())
 
 	if err != nil {
@@ -155,7 +159,7 @@ func sleepChecker(oAuthConf *oauth2.Config, s Store, mg mailgun.Mailgun) func() 
 				continue
 			}
 
-			sleep, err := getSleepData(oAuthConf, token, s)
+			sleep, err := getSleepData(oAuthConf, token, s, *u)
 
 			if err != nil {
 				log.Printf("ERROR: failed to get sleep data: %v\n", err)

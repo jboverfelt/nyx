@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"html/template"
@@ -71,13 +70,13 @@ func fitbitCallback(e *Env, w http.ResponseWriter, r *http.Request) error {
 
 	// here, marshal the token to json
 	// store json str in db
-	tokStr, err := json.Marshal(token)
+	tokStr, err := dumpToken(token)
 
 	if err != nil {
 		return err
 	}
 
-	u.Token = string(tokStr)
+	u.Token = tokStr
 
 	err = e.DB.Upsert(*u)
 
