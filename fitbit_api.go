@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/mailgun/mailgun-go"
+	mailgun "gopkg.in/mailgun/mailgun-go.v1"
 	"github.com/robfig/cron"
 	"golang.org/x/oauth2"
 )

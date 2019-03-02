@@ -8,7 +8,7 @@ import (
 
 	"bytes"
 
-	"github.com/mailgun/mailgun-go"
+	mailgun "gopkg.in/mailgun/mailgun-go.v1"
 )
 
 func genNoSleepMessage() string {

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
-	"github.com/mailgun/mailgun-go"
+	mailgun "gopkg.in/mailgun/mailgun-go.v1"
 	"github.com/robfig/cron"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/fitbit"
